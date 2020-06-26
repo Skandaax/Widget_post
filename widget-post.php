@@ -49,10 +49,9 @@ class Ma_class extends WP_Widget {
     //Mise à jour des options
     }
 
-    /***La méthode Form(), qui sert à afficher les formulaire
+    /***La méthode Form(), qui sert à afficher les formulaires
     ****de configuration du Widget dans l'administration.****/
-    function Form($instance) {
-    //Formulaire des réglages
+    function Form($instance) { 
     }
 }
 
@@ -63,7 +62,7 @@ class Widget_post extends WP_Widget {
         //$slug accepte le nom clé du Widget
         //$name accepte le nom du Widget
         //$widget_ops accepte un tableau avec un nom de classe HTML et une description
-        WP_Widget($slug, $name, $widget_ops, $control_ops);
+        //WP_Widget($slug, $name, $widget_ops, $control_ops);
 
         $widget_ops = array( 'classname' => 'widget-post',
         'description' => 'widget permettant l\'affichage d\'une
@@ -85,5 +84,42 @@ class Widget_post extends WP_Widget {
     }
 
     function form($instance){
+    
+    //Formulaire du widget
+    $defauts = array('title' => 'Articles');
+    $instance = wp_parse_args($instance, $defaults);
+    ?>
+    <p>
+        <label for="<?php echo $this->get_field_id('title'); ?>">
+            Titre :
+        </label>
+        <input type="text" id="<?php echo $this->get_field_id('title'); ?>"
+        name="<?php echo $this->get_field_name('title'); ?>" value="<?php echo $instance['title']; ?>" style="width: 100%;" />   
+    </p>
+        <label for="<?php echo $this->get_field_id('category'); ?>">
+            Catégories : 
+        </label>
+        <select id="<?php echo $this->get_field_id('category'); ?>" name=""
+        value="<?php echo $instance['category']; ?>" style="width: 100%;"> 
+            <option>Toutes les catégories</option>
+    <?php
+        foreach((get_categories()) as $cat) {
+           if($instance['category'] ==$cat->cat_id) {
+               $selected='selected="selected"';
+           }else {
+               $selected='';
+           }
+            echo '<option '.$selected.' value="'.$cat->cat_id.'">'.$cat->cat_name.'</option>';
+        }
+    ?>
+        </select>
+    </p>
+    <?php
     }
 }
+
+/***Enregistrement du Widget*************************/
+function register_my_widget() {
+    register_widget('Widget_Post');
+}
+add_action( 'widgets_init', 'register_my_widget' );
