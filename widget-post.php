@@ -41,6 +41,39 @@ class Ma_class extends WP_Widget {
     *****côté internaute.***********************************/
     function Widget($args, $instance) {
     //Affichage du Widget
+        //récuperer  la valeur du titre
+        extract($args);
+        global $post;
+
+        echo $before_widget;
+            if($instance['title'] !='') {
+                echo $before_title.$instance['title'].$after_title;
+            }
+        echo $after_widget;
+
+        //Récupérer la valeur de la catégorie
+            if($instance['category'] !="") {
+                $args = array('category' => $instance['category']);
+            }else{
+                $args="";
+            }
+        
+            $myposts = get_post($args);
+
+            echo '<ul>';
+            foreach($myposts as $post) {
+                setup_postdata($post);
+
+                echo'<li>';
+                echo'<a href="'.get_the_permalink().'">'.get_the_title().'</a>';
+                echo'</li>';
+            }
+            echo '</ul>';
+            wp_reset_postdata();
+
+            echo $after_widget;
+        
+        
     }
 
     /***La méthode Update(), qui ert àmettre à jour********* 
@@ -80,13 +113,19 @@ class Widget_post extends WP_Widget {
     function Widget($rgs, $instance) {
     }
 
+    //Enregistrer et mettre à jour les option du widget
     function Update($new_instance, $bold_instance) {
+        $instance = $old_instance;
+
+        $instance ['title'] = strip_tags($new_instance['title']);
+        $instance ['category'] = strip_tags($new_instance['category']);
+
+        return $instance;
     }
 
-    function form($instance){
-    
     //Formulaire du widget
-    $defauts = array('title' => 'Articles');
+    function form($instance){
+    $defaults = array('title' => 'Articles');
     $instance = wp_parse_args($instance, $defaults);
     ?>
     <p>
